@@ -1,262 +1,261 @@
 import { useParams, Link } from 'react-router';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { ShoppingCart, Minus, Plus, ArrowLeft, Package, Info, GraduationCap } from 'lucide-react';
-import { getProductBySlug, getRelatedProducts } from '../data/products';
+import { ArrowLeft, Check, Minus, Plus, Ruler, ShoppingBag, Sparkles, WashingMachine } from 'lucide-react';
+import { categories, getProductBySlug, getRelatedProducts, ProductVariant } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { formatCurrency, getDefaultVariant, getDisplayPrice } from '../lib/commerce.js';
 
 export default function ProductPage() {
   const { slug } = useParams();
   const product = slug ? getProductBySlug(slug) : undefined;
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(undefined);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    if (product) {
+      setSelectedVariant(getDefaultVariant(product));
+      setQuantity(1);
+    }
+  }, [product?.id]);
+
+  const relatedProducts = product ? getRelatedProducts(product.id) : [];
+  const price = useMemo(() => product ? getDisplayPrice(product, selectedVariant) : 0, [product, selectedVariant]);
+  const total = price * quantity;
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#fbf6ee] flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-4">Product Not Found</h1>
-          <Link to="/" className="text-[#0EA5E9] hover:text-[#38BDF8]">
-            Return to Home
+          <h1 className="mb-4 font-serif text-4xl font-black text-[#211b17]">Producto no encontrado</h1>
+          <Link to="/" className="font-black text-[#9d6b54] hover:text-[#211b17]">
+            Volver al inicio
           </Link>
         </div>
       </div>
     );
   }
 
-  const relatedProducts = getRelatedProducts(product.id);
-
   const handleAddToCart = () => {
-    addToCart(product, quantity);
-  };
-
-  const handleQuantityChange = (delta: number) => {
-    setQuantity(Math.max(1, quantity + delta));
+    addToCart(product, quantity, selectedVariant);
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
+    <div className="min-h-screen bg-[#fbf6ee]">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition"
+          to={`/category/${product.category}`}
+          className="mb-8 inline-flex items-center gap-2 text-sm font-black text-[#6c5f56] transition hover:text-[#211b17]"
         >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Shop
+          <ArrowLeft className="h-5 w-5" />
+          Volver a {categories[product.category].title}
         </Link>
 
-        {/* Product Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Image */}
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             className="relative"
           >
-            <div className="sticky top-24">
-              <div className="aspect-square rounded-2xl overflow-hidden bg-gray-900">
+            <div className="sticky top-24 overflow-hidden rounded-[2rem] border border-[#ead9c5] bg-[#fff8ed] shadow-sm">
+              <div className="relative aspect-square overflow-hidden bg-[#ead9c5]">
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                 />
-              </div>
-              {product.isKit && (
-                <div className="absolute top-4 right-4 bg-[#0EA5E9] text-white px-4 py-2 rounded-lg font-semibold">
-                  Complete Kit
+                <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+                  {product.badges.map((badge) => (
+                    <span key={badge} className="rounded-full bg-[#fff8ed]/85 px-3 py-1 text-xs font-black text-[#211b17] backdrop-blur">
+                      {badge}
+                    </span>
+                  ))}
                 </div>
-              )}
+              </div>
+              <div className="grid gap-3 p-4 sm:grid-cols-3">
+                {product.benefits.slice(0, 3).map((benefit) => (
+                  <div key={benefit} className="rounded-2xl bg-[#f1e3d2] px-4 py-3 text-sm font-bold text-[#665b52]">
+                    {benefit}
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
 
-          {/* Details */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
+            className="space-y-7"
           >
-            {/* Category Badge */}
             <div>
-              <span className="inline-block bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm font-medium capitalize">
-                {product.category}
+              <span className="text-xs font-black uppercase tracking-[0.18em] text-[#9d6b54]">
+                {categories[product.category].title}
               </span>
-            </div>
-
-            {/* Title & Price */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              <h1 className="mt-3 font-serif text-5xl font-black leading-none tracking-normal text-[#211b17] md:text-6xl">
                 {product.name}
               </h1>
-              <p className="text-4xl font-bold text-[#0EA5E9]">
-                ${product.price.toFixed(2)}
+              <p className="mt-5 text-lg leading-8 text-[#665b52]">
+                {product.description}
               </p>
             </div>
 
-            {/* Description */}
-            <p className="text-gray-300 text-lg leading-relaxed">
-              {product.description}
-            </p>
-
-            {/* Who is it for */}
-            <div className="flex items-center gap-3 bg-gray-900 rounded-lg p-4">
-              <GraduationCap className="w-6 h-6 text-[#0EA5E9] flex-shrink-0" />
-              <div>
-                <p className="text-white font-semibold mb-1">Perfect For</p>
-                <p className="text-gray-400 text-sm">
-                  {product.whoIsItFor === 'beginner' ? 'Beginners - Easy to use' :
-                   product.whoIsItFor === 'advanced' ? 'Enthusiasts - Advanced product' :
-                   'All skill levels'}
-                </p>
+            <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5">
+              <span className="text-sm font-bold text-[#665b52]">Precio</span>
+              <div className="mt-1 flex flex-wrap items-end gap-3">
+                <strong className="text-4xl font-black text-[#211b17]">{formatCurrency(price)}</strong>
+                {selectedVariant && (
+                  <span className="mb-1 rounded-full bg-[#f1e3d2] px-3 py-1 text-sm font-bold text-[#665b52]">
+                    {selectedVariant.label}
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Quantity & Add to Cart */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center bg-gray-900 rounded-lg">
+            {product.variants && product.variants.length > 0 && (
+              <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5">
+                <div className="mb-4 flex items-center gap-2">
+                  <Ruler className="h-5 w-5 text-[#9d6b54]" />
+                  <h2 className="font-black text-[#211b17]">Elegi talle o medida</h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants.map((variant) => (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      disabled={variant.stock === 0}
+                      onClick={() => setSelectedVariant(variant)}
+                      className={`relative rounded-2xl border px-4 py-3 text-left transition ${
+                        selectedVariant?.id === variant.id
+                          ? 'border-[#211b17] bg-[#211b17] text-[#fff8ed]'
+                          : 'border-[#ead9c5] bg-white/55 text-[#211b17] hover:border-[#c8aa8c]'
+                      } ${variant.stock === 0 ? 'cursor-not-allowed opacity-45' : ''}`}
+                    >
+                      <span className="block text-sm font-black">{variant.label}</span>
+                      <span className="block text-xs opacity-75">{formatCurrency(variant.price)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {product.packs && product.packs.length > 0 && (
+              <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5">
+                <div className="mb-3 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-[#9d6b54]" />
+                  <h2 className="font-black text-[#211b17]">Ahorro por pack</h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.packs.map((pack) => (
+                    <button
+                      key={pack.quantity}
+                      type="button"
+                      onClick={() => setQuantity(pack.quantity)}
+                      className={`rounded-2xl border px-4 py-3 text-sm font-black transition ${
+                        quantity === pack.quantity
+                          ? 'border-[#9d6b54] bg-[#9d6b54] text-white'
+                          : 'border-[#ead9c5] bg-white/55 text-[#211b17]'
+                      }`}
+                    >
+                      {pack.label || `${pack.quantity} unidades`} · {formatCurrency(pack.price)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5">
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <span className="font-black text-[#211b17]">Cantidad</span>
+                <div className="flex items-center rounded-full bg-[#f1e3d2]">
                   <button
-                    onClick={() => handleQuantityChange(-1)}
-                    className="p-3 hover:bg-gray-800 transition"
-                    aria-label="Decrease quantity"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-3 text-[#211b17]"
+                    aria-label="Restar cantidad"
                   >
-                    <Minus className="w-5 h-5 text-white" />
+                    <Minus className="h-5 w-5" />
                   </button>
-                  <span className="px-6 text-white font-semibold">{quantity}</span>
+                  <span className="min-w-12 text-center font-black text-[#211b17]">{quantity}</span>
                   <button
-                    onClick={() => handleQuantityChange(1)}
-                    className="p-3 hover:bg-gray-800 transition"
-                    aria-label="Increase quantity"
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-3 text-[#211b17]"
+                    aria-label="Sumar cantidad"
                   >
-                    <Plus className="w-5 h-5 text-white" />
+                    <Plus className="h-5 w-5" />
                   </button>
                 </div>
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 bg-[#0EA5E9] text-white font-semibold py-4 px-8 rounded-lg hover:bg-[#38BDF8] transition-all hover:scale-105 flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
-                </button>
+              </div>
+              <div className="mb-5 flex items-center justify-between border-t border-[#ead9c5] pt-5">
+                <span className="text-[#665b52]">Total estimado</span>
+                <strong className="text-3xl font-black text-[#211b17]">{formatCurrency(total)}</strong>
+              </div>
+              <button
+                onClick={handleAddToCart}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#211b17] px-8 py-4 font-black text-[#fff8ed] transition hover:bg-[#4e3a30]"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                Agregar al carrito
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5">
+                <WashingMachine className="mb-3 h-6 w-6 text-[#9d6b54]" />
+                <h3 className="mb-2 font-black text-[#211b17]">Material y cuidado</h3>
+                <p className="text-sm leading-6 text-[#665b52]">{product.material}</p>
+                <p className="mt-2 text-sm leading-6 text-[#665b52]">{product.care}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5">
+                <Check className="mb-3 h-6 w-6 text-[#9d6b54]" />
+                <h3 className="mb-2 font-black text-[#211b17]">Por que conviene</h3>
+                <ul className="space-y-2 text-sm text-[#665b52]">
+                  {product.benefits.map((benefit) => (
+                    <li key={benefit} className="flex gap-2">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#9d6b54]" />
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-800">
-              <div className="text-center">
-                <p className="text-gray-400 text-sm mb-1">Free Shipping</p>
-                <p className="text-white text-xs">Over $75</p>
+            {product.suggestion && (
+              <div className="rounded-[1.5rem] border border-[#d8b98f] bg-[#f6e3c7] p-5 text-[#211b17]">
+                <span className="text-xs font-black uppercase tracking-[0.16em] text-[#9d6b54]">Sugerencia</span>
+                <p className="mt-2 font-bold leading-7">{product.suggestion}</p>
               </div>
-              <div className="text-center">
-                <p className="text-gray-400 text-sm mb-1">30-Day Returns</p>
-                <p className="text-white text-xs">Guaranteed</p>
-              </div>
-              <div className="text-center">
-                <p className="text-gray-400 text-sm mb-1">Expert Support</p>
-                <p className="text-white text-xs">Via WhatsApp</p>
-              </div>
-            </div>
+            )}
           </motion.div>
         </div>
 
-        {/* Detailed Information */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gray-900 rounded-xl p-6 border border-gray-800"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-[#0EA5E9]/20 p-3 rounded-lg">
-                <Info className="w-6 h-6 text-[#0EA5E9]" />
-              </div>
-              <h3 className="text-xl font-bold text-white">What is it for?</h3>
-            </div>
-            <p className="text-gray-300 leading-relaxed">
-              {product.whatIsItFor}
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="bg-gray-900 rounded-xl p-6 border border-gray-800"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-[#0EA5E9]/20 p-3 rounded-lg">
-                <Package className="w-6 h-6 text-[#0EA5E9]" />
-              </div>
-              <h3 className="text-xl font-bold text-white">How to use</h3>
-            </div>
-            <p className="text-gray-300 leading-relaxed">
-              {product.howToUse}
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="bg-gray-900 rounded-xl p-6 border border-gray-800"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-[#0EA5E9]/20 p-3 rounded-lg">
-                <GraduationCap className="w-6 h-6 text-[#0EA5E9]" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Skill Level</h3>
-            </div>
-            <p className="text-gray-300 leading-relaxed">
-              {product.whoIsItFor === 'beginner'
-                ? 'Perfect for first-time detailers. Easy to use with great results.'
-                : product.whoIsItFor === 'advanced'
-                ? 'Designed for enthusiasts who want professional-grade results.'
-                : 'Suitable for all experience levels, from beginner to advanced.'}
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-              You May Also Like
+          <section className="mt-16">
+            <h2 className="mb-6 font-serif text-4xl font-black tracking-normal text-[#211b17]">
+              Tambien puede servirte
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {relatedProducts.map((related) => (
-                <motion.div
+                <Link
                   key={related.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  to={`/product/${related.slug}`}
+                  className="group overflow-hidden rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] transition hover:-translate-y-1 hover:shadow-xl"
                 >
-                  <Link
-                    to={`/product/${related.slug}`}
-                    className="block bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-[#0EA5E9] transition-all group"
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={related.image}
-                        alt={related.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-white font-semibold mb-2 group-hover:text-[#0EA5E9] transition">
-                        {related.name}
-                      </h3>
-                      <p className="text-xl font-bold text-white">
-                        ${related.price.toFixed(2)}
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
+                  <div className="h-52 overflow-hidden bg-[#ead9c5]">
+                    <img
+                      src={related.image}
+                      alt={related.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-black text-[#211b17]">{related.name}</h3>
+                    <p className="mt-2 text-sm text-[#665b52]">{related.shortDescription}</p>
+                    <p className="mt-4 text-xl font-black text-[#211b17]">{formatCurrency(getDisplayPrice(related))}</p>
+                  </div>
+                </Link>
               ))}
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>

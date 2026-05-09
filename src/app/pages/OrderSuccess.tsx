@@ -1,76 +1,67 @@
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
-import { CheckCircle, Package, Mail } from 'lucide-react';
+import { CheckCircle, MessageCircle, Package } from 'lucide-react';
+import { WHATSAPP_PHONE } from '../lib/commerce.js';
 
 export default function OrderSuccess() {
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#fbf6ee] flex items-center justify-center px-4 py-10">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-2xl w-full"
+        className="w-full max-w-2xl"
       >
-        <div className="bg-gray-900 rounded-2xl p-8 md:p-12 border border-gray-800 text-center">
-          {/* Success Icon */}
+        <div className="rounded-[2rem] border border-[#ead9c5] bg-[#fff8ed] p-8 text-center shadow-sm md:p-12">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center mb-6"
+            transition={{ delay: 0.12, type: 'spring', stiffness: 190 }}
+            className="mb-6 inline-flex items-center justify-center"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-green-500 blur-2xl opacity-50 rounded-full" />
-              <CheckCircle className="w-24 h-24 text-green-500 relative" />
+              <div className="absolute inset-0 rounded-full bg-[#25D366]/25 blur-2xl" />
+              <CheckCircle className="relative h-24 w-24 text-[#25D366]" />
             </div>
           </motion.div>
 
-          {/* Success Message */}
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Order Confirmed!
+          <h1 className="mb-4 font-serif text-4xl font-black tracking-normal text-[#211b17] md:text-5xl">
+            Pedido enviado
           </h1>
-          <p className="text-xl text-gray-300 mb-8">
-            Thank you for your purchase. Your order has been received and is being processed.
+          <p className="mb-8 text-lg leading-8 text-[#665b52]">
+            Abrimos WhatsApp con el resumen del carrito. Si no se abrio, podes escribirnos directo y reenviamos la consulta.
           </p>
 
-          {/* Order Number */}
-          <div className="bg-gray-800 rounded-xl p-6 mb-8">
-            <p className="text-gray-400 text-sm mb-2">Order Number</p>
-            <p className="text-2xl font-bold text-[#0EA5E9]">
-              #IG{Math.floor(Math.random() * 1000000)}
-            </p>
-          </div>
-
-          {/* Next Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-gray-800 rounded-xl p-6 text-left">
-              <Mail className="w-8 h-8 text-[#0EA5E9] mb-3" />
-              <h3 className="text-white font-semibold mb-2">Confirmation Email</h3>
-              <p className="text-gray-400 text-sm">
-                Check your inbox for order details and tracking info
+          <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="rounded-[1.5rem] bg-[#f1e3d2] p-6 text-left">
+              <MessageCircle className="mb-3 h-8 w-8 text-[#25D366]" />
+              <h3 className="mb-2 font-black text-[#211b17]">Coordinamos por WhatsApp</h3>
+              <p className="text-sm leading-6 text-[#665b52]">
+                Confirmamos stock, talles, envio o retiro y forma de pago.
               </p>
             </div>
-            <div className="bg-gray-800 rounded-xl p-6 text-left">
-              <Package className="w-8 h-8 text-[#0EA5E9] mb-3" />
-              <h3 className="text-white font-semibold mb-2">Shipping</h3>
-              <p className="text-gray-400 text-sm">
-                Your order will ship within 1-2 business days
+            <div className="rounded-[1.5rem] bg-[#f1e3d2] p-6 text-left">
+              <Package className="mb-3 h-8 w-8 text-[#9d6b54]" />
+              <h3 className="mb-2 font-black text-[#211b17]">Sin pago online aun</h3>
+              <p className="text-sm leading-6 text-[#665b52]">
+                La estructura queda lista para sumar Mercado Pago en la proxima fase.
               </p>
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               to="/"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#0EA5E9] text-white font-semibold rounded-lg hover:bg-[#38BDF8] transition"
+              className="inline-flex items-center justify-center rounded-full bg-[#211b17] px-8 py-4 font-black text-[#fff8ed] transition hover:bg-[#4e3a30]"
             >
-              Continue Shopping
+              Seguir comprando
             </Link>
             <a
-              href="mailto:info@igdetailing.com"
-              className="inline-flex items-center justify-center px-8 py-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 transition"
+              href={`https://wa.me/${WHATSAPP_PHONE}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center rounded-full border border-[#ead9c5] bg-white/60 px-8 py-4 font-black text-[#211b17] transition hover:bg-white"
             >
-              Contact Support
+              Abrir WhatsApp
             </a>
           </div>
         </div>

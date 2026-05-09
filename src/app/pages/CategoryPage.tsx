@@ -1,150 +1,132 @@
 import { useParams, Link } from 'react-router';
 import { motion } from 'motion/react';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
-import { getProductsByCategory } from '../data/products';
+import { ArrowLeft, ArrowRight, ShoppingBag } from 'lucide-react';
+import { categories, getProductsByCategory } from '../data/products';
 import { useCart } from '../context/CartContext';
-
-const categoryInfo: Record<string, { title: string; description: string }> = {
-  wash: {
-    title: 'Wash Products',
-    description: 'Safe, effective cleaning solutions for your vehicle'
-  },
-  interior: {
-    title: 'Interior Care',
-    description: 'Clean and protect leather, fabric, and all interior surfaces'
-  },
-  protection: {
-    title: 'Protection & Shine',
-    description: 'Waxes, sealants, and polishes for lasting protection'
-  },
-  accessories: {
-    title: 'Accessories & Tools',
-    description: 'Professional-grade tools and microfiber products'
-  },
-  kits: {
-    title: 'Complete Kits',
-    description: 'Everything you need in one convenient package'
-  }
-};
+import { formatCurrency, getDefaultVariant, getDisplayPrice } from '../lib/commerce.js';
 
 export default function CategoryPage() {
   const { category } = useParams();
   const { addToCart } = useCart();
-  
+
   const products = category ? getProductsByCategory(category) : [];
-  const info = category ? categoryInfo[category] : null;
+  const info = category ? categories[category as keyof typeof categories] : null;
 
   if (!info || products.length === 0) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#fbf6ee] flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-4">Category Not Found</h1>
-          <Link to="/" className="text-[#0EA5E9] hover:text-[#38BDF8]">
-            Return to Home
+          <h1 className="mb-4 font-serif text-4xl font-black text-[#211b17]">Categoria no encontrada</h1>
+          <Link to="/" className="font-black text-[#9d6b54] hover:text-[#211b17]">
+            Volver al inicio
           </Link>
         </div>
       </div>
     );
   }
 
-  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+  const handleQuickAdd = (product: any, e: React.MouseEvent) => {
     e.preventDefault();
-    addToCart(product);
+    addToCart(product, 1, getDefaultVariant(product));
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
+    <div className="min-h-screen bg-[#fbf6ee]">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-black text-[#6c5f56] transition hover:text-[#211b17]"
         >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Home
+          <ArrowLeft className="h-5 w-5" />
+          Volver al inicio
         </Link>
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="mb-10 rounded-[2rem] border border-[#ead9c5] bg-[#fff8ed] p-7 shadow-sm sm:p-10"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <span className="text-xs font-black uppercase tracking-[0.18em] text-[#9d6b54]">
+            {info.short}
+          </span>
+          <h1 className="mt-2 font-serif text-5xl font-black leading-none tracking-normal text-[#211b17] md:text-7xl">
             {info.title}
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-[#665b52]">
             {info.description}
           </p>
         </motion.div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link
-                to={`/product/${product.slug}`}
-                className="block bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-[#0EA5E9] transition-all group h-full flex flex-col"
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {products.map((product, index) => {
+            const defaultVariant = getDefaultVariant(product);
+            const price = getDisplayPrice(product, defaultVariant);
+
+            return (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
               >
-                {/* Image */}
-                <div className="relative h-56 overflow-hidden bg-gray-800">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {product.isKit && (
-                    <div className="absolute top-3 right-3 bg-[#0EA5E9] text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      Kit
+                <Link
+                  to={`/product/${product.slug}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] shadow-sm transition hover:-translate-y-1 hover:border-[#c8aa8c] hover:shadow-xl"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#ead9c5]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                      {product.badges.slice(0, 2).map((badge) => (
+                        <span key={badge} className="rounded-full bg-[#fff8ed]/85 px-3 py-1 text-xs font-black text-[#211b17] backdrop-blur">
+                          {badge}
+                        </span>
+                      ))}
                     </div>
-                  )}
-                  {product.isBestSeller && !product.isKit && (
-                    <div className="absolute top-3 right-3 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-semibold">
-                      Best Seller
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col">
-                  <h3 className="text-white font-bold text-lg mb-2 group-hover:text-[#0EA5E9] transition">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-4 flex-1 line-clamp-2">
-                    {product.shortDescription}
-                  </p>
-
-                  {/* Badge */}
-                  <div className="mb-4">
-                    <span className="inline-block bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs">
-                      {product.whoIsItFor === 'beginner' ? 'Beginner Friendly' : 
-                       product.whoIsItFor === 'advanced' ? 'Advanced' : 
-                       'All Levels'}
-                    </span>
                   </div>
 
-                  {/* Price & CTA */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-white">
-                      ${product.price.toFixed(2)}
-                    </span>
-                    <button
-                      onClick={(e) => handleAddToCart(product, e)}
-                      className="bg-[#0EA5E9] text-white p-2.5 rounded-lg hover:bg-[#38BDF8] transition"
-                      aria-label="Add to cart"
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="mb-2 text-xs font-black uppercase tracking-[0.14em] text-[#9d6b54]">
+                      {categories[product.category].title}
+                    </p>
+                    <h3 className="text-xl font-black text-[#211b17] transition group-hover:text-[#9d6b54]">
+                      {product.name}
+                    </h3>
+                    <p className="mt-2 flex-1 text-sm leading-6 text-[#665b52]">
+                      {product.shortDescription}
+                    </p>
+                    {defaultVariant && (
+                      <p className="mt-4 rounded-2xl bg-[#f1e3d2] px-3 py-2 text-xs font-bold text-[#6c5f56]">
+                        Desde {defaultVariant.label}
+                      </p>
+                    )}
+                    <div className="mt-5 flex items-center justify-between gap-3">
+                      <span className="text-2xl font-black text-[#211b17]">
+                        {formatCurrency(price)}
+                      </span>
+                      {product.variants?.length ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#211b17] px-4 py-2 text-sm font-black text-[#fff8ed]">
+                          Elegir
+                          <ArrowRight className="h-4 w-4" />
+                        </span>
+                      ) : (
+                        <button
+                          onClick={(e) => handleQuickAdd(product, e)}
+                          className="rounded-full bg-[#211b17] p-3 text-[#fff8ed] transition hover:bg-[#4e3a30]"
+                          aria-label="Agregar al carrito"
+                        >
+                          <ShoppingBag className="h-5 w-5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </div>

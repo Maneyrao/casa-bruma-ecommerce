@@ -1,7 +1,15 @@
 import { Link } from 'react-router';
-import { ShoppingCart, Menu, X } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { MessageCircle, Menu, ShoppingBag, X } from 'lucide-react';
 import { useState } from 'react';
+import { useCart } from '../context/CartContext';
+import { WHATSAPP_PHONE } from '../lib/commerce.js';
+
+const navItems = [
+  { label: 'Blanqueria', to: '/category/blanqueria' },
+  { label: 'Remeras termicas', to: '/category/termicas' },
+  { label: 'Frazadas', to: '/category/frazadas' },
+  { label: 'Combos', to: '/category/combos' },
+];
 
 export const Header = () => {
   const { getCartCount } = useCart();
@@ -9,102 +17,80 @@ export const Header = () => {
   const cartCount = getCartCount();
 
   return (
-    <header className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold">
-              <span className="text-white">IG</span>
-              <span className="text-[#0EA5E9]"> Detailing Shop</span>
-            </div>
+    <header className="sticky top-0 z-50 border-b border-[#ead9c5] bg-[#fff8ed]/88 backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-[4.25rem] items-center justify-between gap-4 py-3">
+          <Link to="/" className="font-serif text-2xl font-black tracking-normal text-[#211b17]">
+            Casa Bruma
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/category/wash" className="text-gray-300 hover:text-white transition">
-              Wash
-            </Link>
-            <Link to="/category/interior" className="text-gray-300 hover:text-white transition">
-              Interior
-            </Link>
-            <Link to="/category/protection" className="text-gray-300 hover:text-white transition">
-              Protection
-            </Link>
-            <Link to="/category/accessories" className="text-gray-300 hover:text-white transition">
-              Accessories
-            </Link>
-            <Link 
-              to="/category/kits" 
-              className="text-[#0EA5E9] font-semibold hover:text-[#38BDF8] transition"
-            >
-              Kits
-            </Link>
+          <nav className="hidden items-center gap-7 md:flex">
+            {navItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-sm font-bold text-[#6c5f56] transition hover:text-[#211b17]"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Cart */}
-          <div className="flex items-center space-x-4">
-            <Link 
-              to="/cart" 
-              className="relative p-2 text-gray-300 hover:text-white transition"
+          <div className="flex items-center gap-2">
+            <a
+              href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent('Hola Casa Bruma! Quiero consultar por productos.')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden items-center gap-2 rounded-full bg-[#211b17] px-4 py-2 text-sm font-black text-[#fff8ed] transition hover:bg-[#4e3a30] sm:inline-flex"
             >
-              <ShoppingCart className="w-6 h-6" />
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </a>
+
+            <Link
+              to="/cart"
+              className="relative rounded-full border border-[#ead9c5] bg-white/70 p-2.5 text-[#211b17] transition hover:bg-white"
+              aria-label="Abrir carrito"
+            >
+              <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#0EA5E9] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d6b54] px-1 text-xs font-black text-white">
                   {cartCount}
                 </span>
               )}
             </Link>
 
-            {/* Mobile Menu Button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-300 hover:text-white transition"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              className="rounded-full border border-[#ead9c5] bg-white/70 p-2.5 text-[#211b17] transition hover:bg-white md:hidden"
+              aria-label="Abrir menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-800">
-            <div className="flex flex-col space-y-3">
-              <Link 
-                to="/category/wash" 
-                className="text-gray-300 hover:text-white transition py-2"
-                onClick={() => setMobileMenuOpen(false)}
+          <nav className="border-t border-[#ead9c5] py-4 md:hidden">
+            <div className="grid gap-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="rounded-2xl bg-white/55 px-4 py-3 text-base font-black text-[#211b17]"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <a
+                href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent('Hola Casa Bruma! Quiero consultar por productos.')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-2xl bg-[#211b17] px-4 py-3 text-base font-black text-[#fff8ed]"
               >
-                Wash
-              </Link>
-              <Link 
-                to="/category/interior" 
-                className="text-gray-300 hover:text-white transition py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Interior
-              </Link>
-              <Link 
-                to="/category/protection" 
-                className="text-gray-300 hover:text-white transition py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Protection
-              </Link>
-              <Link 
-                to="/category/accessories" 
-                className="text-gray-300 hover:text-white transition py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Accessories
-              </Link>
-              <Link 
-                to="/category/kits" 
-                className="text-[#0EA5E9] font-semibold hover:text-[#38BDF8] transition py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Kits
-              </Link>
+                Consultar por WhatsApp
+              </a>
             </div>
           </nav>
         )}

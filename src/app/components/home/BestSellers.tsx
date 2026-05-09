@@ -1,86 +1,72 @@
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
-import { ShoppingCart } from 'lucide-react';
-import { getBestSellers } from '../../data/products';
-import { useCart } from '../../context/CartContext';
+import { ArrowRight } from 'lucide-react';
+import { categories, getBestSellers } from '../../data/products';
+import { formatCurrency, getDefaultVariant, getDisplayPrice } from '../../lib/commerce.js';
 
 export const BestSellers = () => {
-  const bestSellers = getBestSellers().filter(p => !p.isKit).slice(0, 4);
-  const { addToCart } = useCart();
-
-  const handleAddToCart = (product: any, e: React.MouseEvent) => {
-    e.preventDefault();
-    addToCart(product);
-  };
+  const bestSellers = getBestSellers().slice(0, 4);
 
   return (
-    <section className="py-16 bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="text-[#0EA5E9] font-semibold text-sm uppercase tracking-wide">
-              Most Popular
+    <section className="bg-[#fbf6ee] py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <span className="text-xs font-black uppercase tracking-[0.18em] text-[#9d6b54]">
+              Lo que mas sale
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
-              Best Sellers
+            <h2 className="mt-2 font-serif text-4xl font-black tracking-normal text-[#211b17] md:text-5xl">
+              Favoritos para comprar sin dudar.
             </h2>
-            <p className="text-gray-400 text-lg">
-              Our customers' favorite products
-            </p>
-          </motion.div>
+          </div>
+          <Link to="/category/combos" className="inline-flex items-center gap-2 font-black text-[#9d6b54] hover:text-[#211b17]">
+            Ver combos
+            <ArrowRight className="h-5 w-5" />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bestSellers.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link
-                to={`/product/${product.slug}`}
-                className="block bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-[#0EA5E9] transition-all group hover:shadow-lg"
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {bestSellers.map((product, index) => {
+            const defaultVariant = getDefaultVariant(product);
+            return (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.06 }}
               >
-                {/* Image */}
-                <div className="relative h-48 overflow-hidden bg-gray-900">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="text-white font-semibold mb-2 group-hover:text-[#0EA5E9] transition">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-                    {product.shortDescription}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-white">
-                      ${product.price.toFixed(2)}
+                <Link
+                  to={`/product/${product.slug}`}
+                  className="group block overflow-hidden rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] transition hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#ead9c5]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span className="absolute left-3 top-3 rounded-full bg-[#211b17]/85 px-3 py-1 text-xs font-black text-[#fff8ed] backdrop-blur">
+                      Mas vendido
                     </span>
-                    <button
-                      onClick={(e) => handleAddToCart(product, e)}
-                      className="bg-[#0EA5E9] text-white p-2 rounded-lg hover:bg-[#38BDF8] transition"
-                      aria-label="Add to cart"
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                  <div className="p-5">
+                    <p className="mb-2 text-xs font-black uppercase tracking-[0.14em] text-[#9d6b54]">
+                      {categories[product.category].title}
+                    </p>
+                    <h3 className="font-black text-[#211b17] group-hover:text-[#9d6b54]">{product.name}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#665b52]">{product.shortDescription}</p>
+                    {defaultVariant && (
+                      <p className="mt-3 text-xs font-bold text-[#7d503f]">{defaultVariant.label}</p>
+                    )}
+                    <p className="mt-4 text-2xl font-black text-[#211b17]">
+                      {formatCurrency(getDisplayPrice(product, defaultVariant))}
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,228 +1,171 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { motion } from 'motion/react';
-import { ArrowLeft, CreditCard, Lock } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Send } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { buildWhatsAppCheckoutUrl, formatCurrency, WHATSAPP_PHONE } from '../lib/commerce.js';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, getCartTotal, clearCart } = useCart();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { items, getCartTotal, getShipping, clearCart } = useCart();
+  const [customer, setCustomer] = useState({
+    name: '',
+    locality: '',
+    delivery: 'Envio a coordinar',
+    notes: '',
+  });
 
   const subtotal = getCartTotal();
-  const shipping = subtotal >= 75 ? 0 : 9.99;
-  const total = subtotal + shipping;
+  const shipping = getShipping();
+  const total = subtotal + shipping.cost;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
+  const whatsappUrl = useMemo(
+    () => buildWhatsAppCheckoutUrl({ phone: WHATSAPP_PHONE, customer, items, total }),
+    [customer, items, total]
+  );
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#fbf6ee] flex items-center justify-center px-4">
+        <div className="text-center">
+          <h1 className="mb-4 font-serif text-4xl font-black text-[#211b17]">No hay productos para confirmar</h1>
+          <Link to="/" className="font-black text-[#9d6b54] hover:text-[#211b17]">
+            Volver a comprar
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     clearCart();
     navigate('/order-success');
   };
 
-  if (items.length === 0) {
-    navigate('/cart');
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-black py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
+    <div className="min-h-screen bg-[#fbf6ee] py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Link
           to="/cart"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-black text-[#6c5f56] transition hover:text-[#211b17]"
         >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Cart
+          <ArrowLeft className="h-5 w-5" />
+          Volver al carrito
         </Link>
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Checkout</h1>
-          <p className="text-gray-400 flex items-center gap-2">
-            <Lock className="w-4 h-4" />
-            Secure checkout powered by SSL encryption
-          </p>
-        </motion.div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <form onSubmit={handleSubmit} className="space-y-6 lg:col-span-2">
+            <div>
+              <span className="text-xs font-black uppercase tracking-[0.18em] text-[#9d6b54]">
+                Ultimo paso
+              </span>
+              <h1 className="mt-2 font-serif text-5xl font-black leading-none tracking-normal text-[#211b17] md:text-6xl">
+                Confirmar pedido por WhatsApp
+              </h1>
+              <p className="mt-4 max-w-2xl text-lg leading-8 text-[#665b52]">
+                No cobramos aca todavia. Enviamos el resumen para coordinar disponibilidad, envio y forma de pago.
+              </p>
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Checkout Form */}
-          <div className="lg:col-span-2">
-            <motion.form
-              onSubmit={handleSubmit}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-8"
+            <div className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-6 shadow-sm">
+              <h2 className="mb-5 text-2xl font-black text-[#211b17]">Tus datos</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-2 text-sm font-black text-[#211b17]">
+                  Nombre
+                  <input
+                    value={customer.name}
+                    onChange={(event) => setCustomer((value) => ({ ...value, name: event.target.value }))}
+                    required
+                    className="rounded-2xl border border-[#ead9c5] bg-white/70 px-4 py-3 font-normal outline-none focus:border-[#9d6b54]"
+                    placeholder="Tu nombre"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-black text-[#211b17]">
+                  Zona / localidad
+                  <input
+                    value={customer.locality}
+                    onChange={(event) => setCustomer((value) => ({ ...value, locality: event.target.value }))}
+                    required
+                    className="rounded-2xl border border-[#ead9c5] bg-white/70 px-4 py-3 font-normal outline-none focus:border-[#9d6b54]"
+                    placeholder="CABA, GBA, interior..."
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-black text-[#211b17]">
+                  Entrega
+                  <select
+                    value={customer.delivery}
+                    onChange={(event) => setCustomer((value) => ({ ...value, delivery: event.target.value }))}
+                    className="rounded-2xl border border-[#ead9c5] bg-white/70 px-4 py-3 font-normal outline-none focus:border-[#9d6b54]"
+                  >
+                    <option>Envio a coordinar</option>
+                    <option>Retiro</option>
+                    <option>Quiero consultar opciones</option>
+                  </select>
+                </label>
+                <label className="grid gap-2 text-sm font-black text-[#211b17] sm:col-span-2">
+                  Notas
+                  <textarea
+                    value={customer.notes}
+                    onChange={(event) => setCustomer((value) => ({ ...value, notes: event.target.value }))}
+                    className="min-h-28 rounded-2xl border border-[#ead9c5] bg-white/70 px-4 py-3 font-normal outline-none focus:border-[#9d6b54]"
+                    placeholder="Talle alternativo, color preferido, horario de contacto..."
+                  />
+                </label>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-8 py-4 font-black text-white transition hover:bg-[#20bd5a]"
             >
-              {/* Contact Information */}
-              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-                <h2 className="text-xl font-bold text-white mb-6">Contact Information</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-300 mb-2">Email</label>
-                    <input
-                      type="email"
-                      required
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
+              <Send className="h-5 w-5" />
+              Enviar pedido por WhatsApp
+            </button>
+          </form>
+
+          <aside className="lg:col-span-1">
+            <div className="sticky top-24 rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-6 shadow-sm">
+              <div className="mb-5 flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                <h2 className="text-xl font-black text-[#211b17]">Resumen a enviar</h2>
               </div>
-
-              {/* Shipping Address */}
-              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-                <h2 className="text-xl font-bold text-white mb-6">Shipping Address</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-300 mb-2">First Name</label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-300 mb-2">Last Name</label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-gray-300 mb-2">Address</label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-300 mb-2">City</label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-300 mb-2">ZIP Code</label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-                <h2 className="text-xl font-bold text-white mb-6">Payment Method</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-300 mb-2">Card Number</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        required
-                        placeholder="1234 5678 9012 3456"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                      />
-                      <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-300 mb-2">Expiry Date</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="MM/YY"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-300 mb-2">CVV</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="123"
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isProcessing}
-                className="w-full bg-[#0EA5E9] text-white font-semibold py-4 rounded-lg hover:bg-[#38BDF8] transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? 'Processing...' : `Pay $${total.toFixed(2)}`}
-              </button>
-            </motion.form>
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-900 rounded-xl p-6 border border-gray-800 sticky top-24"
-            >
-              <h2 className="text-xl font-bold text-white mb-6">Order Summary</h2>
-
-              <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+              <div className="max-h-72 space-y-4 overflow-y-auto pr-1">
                 {items.map((item) => (
-                  <div key={item.product.id} className="flex gap-3">
-                    <img
-                      src={item.product.image}
-                      alt={item.product.name}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-white text-sm font-semibold truncate">
-                        {item.product.name}
-                      </h3>
-                      <p className="text-gray-400 text-sm">Qty: {item.quantity}</p>
-                      <p className="text-white font-semibold">
-                        ${(item.product.price * item.quantity).toFixed(2)}
-                      </p>
+                  <div key={item.id} className="flex gap-3">
+                    <img src={item.image} alt={item.name} className="h-16 w-16 rounded-2xl object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-black text-[#211b17]">{item.name}</p>
+                      {item.variant && <p className="text-xs font-bold text-[#9d6b54]">{item.variant.label}</p>}
+                      <p className="text-sm text-[#665b52]">x{item.quantity}</p>
                     </div>
                   </div>
                 ))}
               </div>
-
-              <div className="space-y-3 border-t border-gray-800 pt-4">
-                <div className="flex justify-between text-gray-300">
+              <div className="mt-5 border-t border-[#ead9c5] pt-5">
+                <div className="mb-2 flex justify-between text-[#665b52]">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatCurrency(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
-                  <span>Shipping</span>
-                  <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                <div className="mb-4 flex justify-between text-[#665b52]">
+                  <span>{shipping.label}</span>
+                  <span>{shipping.isFree ? 'Sin cargo' : formatCurrency(shipping.cost)}</span>
                 </div>
-                <div className="border-t border-gray-700 pt-3">
-                  <div className="flex justify-between text-white text-xl font-bold">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
+                <div className="flex justify-between text-2xl font-black text-[#211b17]">
+                  <span>Total</span>
+                  <span>{formatCurrency(total)}</span>
                 </div>
               </div>
-            </motion.div>
-          </div>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 block break-words rounded-2xl bg-[#f1e3d2] p-3 text-xs text-[#665b52]"
+              >
+                Vista previa del enlace WhatsApp
+              </a>
+            </div>
+          </aside>
         </div>
       </div>
     </div>

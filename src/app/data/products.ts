@@ -1,216 +1,291 @@
+export type ProductCategory = 'termicas' | 'sabanas' | 'almohadas' | 'frazadas' | 'combos';
+export type CategorySlug = ProductCategory | 'blanqueria';
+
+export interface ProductVariant {
+  id: string;
+  label: string;
+  price: number;
+  stock: number;
+  isDefault?: boolean;
+  detail?: string;
+}
+
+export interface Pack {
+  quantity: number;
+  price: number;
+  label?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   slug: string;
-  category: 'wash' | 'interior' | 'protection' | 'accessories' | 'kits';
+  category: ProductCategory;
   price: number;
   image: string;
   shortDescription: string;
   description: string;
-  whatIsItFor: string;
-  howToUse: string;
-  whoIsItFor: 'beginner' | 'advanced' | 'both';
+  material: string;
+  care: string;
+  benefits: string[];
+  badges: string[];
+  variants?: ProductVariant[];
+  packs?: Pack[];
   isBestSeller?: boolean;
   isKit?: boolean;
+  featured?: boolean;
   relatedProducts?: string[];
+  suggestion?: string;
 }
 
+export const categories: Record<CategorySlug, { title: string; description: string; short: string }> = {
+  blanqueria: {
+    title: 'Blanqueria',
+    short: 'Cama completa',
+    description: 'Sabanas, almohadas, frazadas y mantas para armar una cama mas suave, calida y facil de comprar.',
+  },
+  termicas: {
+    title: 'Remeras termicas',
+    short: 'Abrigo liviano',
+    description: 'Primera piel, cuello redondo y capas termicas para salir o dormir sin pasar frio.',
+  },
+  sabanas: {
+    title: 'Sabanas',
+    short: 'Cama suave',
+    description: 'Juegos de sabanas por plaza, pensados para renovar la cama sin perder practicidad.',
+  },
+  almohadas: {
+    title: 'Almohadas',
+    short: 'Descanso real',
+    description: 'Almohadas mullidas, firmes y faciles de combinar con fundas y juegos de cama.',
+  },
+  frazadas: {
+    title: 'Frazadas y mantas',
+    short: 'Calor de noche',
+    description: 'Textiles abrigados para sumar capas, textura y temperatura a la cama.',
+  },
+  combos: {
+    title: 'Combos',
+    short: 'Compra resuelta',
+    description: 'Selecciones listas para cama, invierno y regalos utiles.',
+  },
+};
+
 export const products: Product[] = [
-  // KITS
   {
-    id: 'beginner-kit',
-    name: 'Beginner Detail Kit',
-    slug: 'beginner-detail-kit',
-    category: 'kits',
-    price: 89.99,
-    image: 'https://images.unsplash.com/photo-1620584898989-d39f7f9ed1b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZXRhaWxpbmclMjBraXQlMjBwcm9kdWN0cyUyMHRvb2xzfGVufDF8fHx8MTc3NjQ0MTQwNnww&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Everything you need to start detailing like a pro',
-    description: 'Complete starter kit with pH-neutral shampoo, premium microfiber towels, tire cleaner, and interior spray. Perfect for first-time detailers.',
-    whatIsItFor: 'Getting professional results without confusion. This kit contains the essential products needed for a complete exterior and interior detail.',
-    howToUse: '1. Start with the wash shampoo and microfiber mitt. 2. Dry with the drying towel. 3. Clean tires with tire cleaner. 4. Finish interior with quick detailer spray.',
-    whoIsItFor: 'beginner',
+    id: 'combo-sueno-calido',
+    name: 'Combo sueno calido',
+    slug: 'combo-sueno-calido',
+    category: 'combos',
+    price: 48900,
+    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Frazada soft, almohada y sabana ajustable para resolver la cama entera.',
+    description: 'Un combo pensado para convertir una cama fria en una cama lista para invierno. Ideal si queres comprar rapido y no olvidarte de nada.',
+    material: 'Microfibra soft, relleno siliconado y algodon mixto.',
+    care: 'Lavar con agua fria, secado a baja temperatura y evitar lavandina.',
+    benefits: ['Compra guiada', 'Ahorro por combo', 'Texturas suaves', 'Listo para regalar'],
+    badges: ['Combo ahorro', 'Invierno', 'Mas elegido'],
+    variants: [
+      { id: '1-plaza', label: '1 plaza', price: 48900, stock: 12, isDefault: true },
+      { id: '2-plazas', label: '2 plazas', price: 62900, stock: 9 },
+      { id: 'queen', label: 'Queen', price: 72900, stock: 6 },
+    ],
     isKit: true,
     isBestSeller: true,
-    relatedProducts: ['premium-shampoo', 'microfiber-set', 'tire-cleaner']
+    featured: true,
+    relatedProducts: ['frazada-sherpa-nube', 'almohada-hotel-soft', 'sabana-ajustable-algodon'],
+    suggestion: 'Sumale una remera termica para cerrar el kit noche fria.',
   },
   {
-    id: 'interior-kit',
-    name: 'Interior Refresh Kit',
-    slug: 'interior-refresh-kit',
-    category: 'kits',
-    price: 79.99,
-    image: 'https://images.unsplash.com/photo-1590456744036-1467d08b88a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjBpbnRlcmlvciUyMGNsZWFuJTIwbGVhdGhlcnxlbnwxfHx8fDE3NzY0NDE0MDV8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Deep clean and protect your interior surfaces',
-    description: 'Specialized kit for leather, plastic, and fabric. Includes leather cleaner & conditioner, interior detailer, and premium microfiber cloths.',
-    whatIsItFor: 'Restoring and protecting all interior surfaces including leather seats, dashboard, door panels, and center console.',
-    howToUse: '1. Vacuum first. 2. Apply leather cleaner to seats. 3. Use interior detailer on plastics. 4. Condition leather surfaces. 5. Buff with microfiber.',
-    whoIsItFor: 'both',
+    id: 'kit-noche-termica',
+    name: 'Kit noche termica',
+    slug: 'kit-noche-termica',
+    category: 'combos',
+    price: 38900,
+    image: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Remera termica + frazada liviana para dormir o levantarte abrigado.',
+    description: 'La opcion directa para quienes sienten frio de noche: primera piel suave y una capa de cama liviana con tacto abrigado.',
+    material: 'Polialgodon termico y microfibra soft.',
+    care: 'Lavar del reves, no retorcer y secar extendido.',
+    benefits: ['Primera piel', 'No pica', 'Ideal entretiempo e invierno', 'Pack sugerido'],
+    badges: ['Noche fria', 'Pack termico'],
+    variants: [
+      { id: 's', label: 'Talle S', price: 38900, stock: 10 },
+      { id: 'm', label: 'Talle M', price: 38900, stock: 14, isDefault: true },
+      { id: 'l', label: 'Talle L', price: 38900, stock: 12 },
+      { id: 'xl', label: 'Talle XL', price: 40900, stock: 8 },
+    ],
     isKit: true,
+    featured: true,
+    relatedProducts: ['remera-termica-primera-piel', 'frazada-sherpa-nube'],
+    suggestion: 'Llevando dos remeras termicas tenes una lista para lavar y otra para usar.',
+  },
+  {
+    id: 'remera-termica-primera-piel',
+    name: 'Remera termica primera piel',
+    slug: 'remera-termica-primera-piel',
+    category: 'termicas',
+    price: 21900,
+    image: 'https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Capa liviana, elastizada y suave para usar debajo de todo.',
+    description: 'Remera termica de uso diario: acompana el cuerpo, conserva temperatura y no suma volumen debajo de buzos, camisas o pijamas.',
+    material: 'Polialgodon elastizado termico.',
+    care: 'Lavar con colores similares, no planchar sobre estampas y evitar secadora fuerte.',
+    benefits: ['Abrigo sin volumen', 'Tacto suave', 'Respirable', 'Uso diario'],
+    badges: ['Talles S-XXL', 'Primera piel', 'Best seller'],
+    variants: [
+      { id: 's-negro', label: 'S / Negro', price: 21900, stock: 8 },
+      { id: 'm-negro', label: 'M / Negro', price: 21900, stock: 15, isDefault: true },
+      { id: 'l-negro', label: 'L / Negro', price: 21900, stock: 12 },
+      { id: 'xl-negro', label: 'XL / Negro', price: 23900, stock: 8 },
+      { id: 'xxl-negro', label: 'XXL / Negro', price: 24900, stock: 5 },
+    ],
+    packs: [
+      { quantity: 2, price: 39900, label: 'Pack x2' },
+      { quantity: 3, price: 57900, label: 'Pack x3' },
+    ],
     isBestSeller: true,
-    relatedProducts: ['leather-cleaner', 'interior-detailer', 'microfiber-set']
+    relatedProducts: ['kit-noche-termica', 'frazada-sherpa-nube'],
+    suggestion: 'Si dudas entre talles, elegi uno mas para usarla como capa de dormir.',
   },
   {
-    id: 'shine-kit',
-    name: 'Ultimate Shine Kit',
-    slug: 'ultimate-shine-kit',
-    category: 'kits',
-    price: 129.99,
-    image: 'https://images.unsplash.com/photo-1723659081228-94b14d1e61d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjYXIlMjBkZXRhaWwlMjBzaGluZXxlbnwxfHx8fDE3NzYzODI1NTZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Maximum gloss and protection for paint perfectionists',
-    description: 'Premium paint correction and protection system. Includes clay bar, polish, ceramic spray wax, and applicators for showroom finish.',
-    whatIsItFor: 'Achieving deep gloss and long-lasting protection. Removes light swirls and creates a hydrophobic barrier.',
-    howToUse: '1. Wash and dry car. 2. Clay bar treatment. 3. Apply polish with applicator. 4. Buff off. 5. Apply ceramic spray wax. 6. Buff to shine.',
-    whoIsItFor: 'advanced',
-    isKit: true,
+    id: 'frazada-sherpa-nube',
+    name: 'Frazada sherpa nube',
+    slug: 'frazada-sherpa-nube',
+    category: 'frazadas',
+    price: 32900,
+    image: 'https://images.unsplash.com/photo-1616627988081-0f3f3f63d6a1?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Frazada abrigada con textura mullida y reverso suave.',
+    description: 'Pensada para sumar calor sin que la cama se sienta pesada. Va sola en entretiempo o como capa extra en invierno.',
+    material: 'Microfibra sherpa doble faz.',
+    care: 'Lavar en ciclo delicado y secar extendida para conservar el volumen.',
+    benefits: ['Muy abrigada', 'Tacto mullido', 'No pesa', 'Ideal sofa o cama'],
+    badges: ['Sherpa', 'Abrigo alto'],
+    variants: [
+      { id: '1-plaza-gris', label: '1 plaza / Gris', price: 32900, stock: 9 },
+      { id: '2-plazas-gris', label: '2 plazas / Gris', price: 46900, stock: 8, isDefault: true },
+      { id: 'queen-beige', label: 'Queen / Beige', price: 54900, stock: 6 },
+    ],
     isBestSeller: true,
-    relatedProducts: ['ceramic-wax', 'clay-bar', 'paint-polish']
+    relatedProducts: ['combo-sueno-calido', 'almohada-hotel-soft'],
   },
-
-  // WASH PRODUCTS
   {
-    id: 'premium-shampoo',
-    name: 'pH Neutral Car Shampoo',
-    slug: 'ph-neutral-car-shampoo',
-    category: 'wash',
-    price: 24.99,
-    image: 'https://images.unsplash.com/photo-1697273245326-1a3736f6f428?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjBzaGFtcG9vJTIwYm90dGxlJTIwcHJvZHVjdHxlbnwxfHx8fDE3NzY0NDE0MDR8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Safe, streak-free wash for all paint types',
-    description: 'Professional-grade pH neutral formula that safely removes dirt without stripping wax or sealant. High foam, high lubrication. 16 oz concentrate makes 32 washes.',
-    whatIsItFor: 'Weekly maintenance washing that won\'t damage your paint, wax, or coating. Safe for all finishes including matte and wrapped vehicles.',
-    howToUse: '1. Mix 1-2 oz with 3-5 gallons of water. 2. Use with wash mitt in straight lines. 3. Rinse thoroughly with clean water. 4. Dry immediately.',
-    whoIsItFor: 'both',
+    id: 'sabana-ajustable-algodon',
+    name: 'Sabana ajustable algodon',
+    slug: 'sabana-ajustable-algodon',
+    category: 'sabanas',
+    price: 18900,
+    image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Ajuste firme, tacto fresco y colores faciles de combinar.',
+    description: 'Una base simple para renovar la cama: elastico perimetral, caida prolija y tacto agradable para uso diario.',
+    material: 'Algodon mixto de facil lavado.',
+    care: 'Lavar antes del primer uso, no mezclar con prendas con cierre o velcro.',
+    benefits: ['No se sale facil', 'Secado rapido', 'Tacto suave', 'Colores neutros'],
+    badges: ['Algodon mixto', 'Uso diario'],
+    variants: [
+      { id: '1-plaza-blanco', label: '1 plaza / Blanco', price: 18900, stock: 13 },
+      { id: '2-plazas-blanco', label: '2 plazas / Blanco', price: 24900, stock: 10, isDefault: true },
+      { id: 'queen-vison', label: 'Queen / Vison', price: 29900, stock: 7 },
+      { id: 'king-vison', label: 'King / Vison', price: 34900, stock: 5 },
+    ],
+    relatedProducts: ['combo-sueno-calido', 'almohada-hotel-soft'],
+  },
+  {
+    id: 'almohada-hotel-soft',
+    name: 'Almohada hotel soft',
+    slug: 'almohada-hotel-soft',
+    category: 'almohadas',
+    price: 16900,
+    image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Mullida, liviana y con soporte medio para descanso diario.',
+    description: 'Almohada de soporte medio, facil de combinar y pensada para quienes buscan una sensacion tipo hotel en casa.',
+    material: 'Relleno siliconado premium y funda de microfibra.',
+    care: 'Airear semanalmente y lavar funda protectora por separado.',
+    benefits: ['Soporte medio', 'Mullida', 'Hipoalergenica', 'Sensacion hotel'],
+    badges: ['Hotel soft', 'Hipoalergenica'],
+    variants: [
+      { id: 'standard', label: 'Standard 50x70', price: 16900, stock: 20, isDefault: true },
+      { id: 'king', label: 'King 50x90', price: 21900, stock: 11 },
+    ],
+    packs: [{ quantity: 2, price: 30900, label: 'Par ahorro' }],
     isBestSeller: true,
-    relatedProducts: ['wash-mitt', 'drying-towel', 'wheel-cleaner']
+    relatedProducts: ['sabana-ajustable-algodon', 'combo-sueno-calido'],
   },
   {
-    id: 'microfiber-set',
-    name: 'Premium Microfiber Towel Set',
-    slug: 'premium-microfiber-towel-set',
-    category: 'accessories',
-    price: 34.99,
-    image: 'https://images.unsplash.com/photo-1714058948946-8fc9c3fa6a67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWNyb2ZpYmVyJTIwdG93ZWwlMjBjbGVhbmluZ3xlbnwxfHx8fDE3NzY0NDE0MDV8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Ultra-soft 800 GSM professional towels (6-pack)',
-    description: 'Professional quality microfiber in multiple colors for different tasks. Scratch-free, lint-free, super absorbent. Includes 2 drying, 2 buffing, 2 interior towels.',
-    whatIsItFor: 'Safe drying, buffing, and interior cleaning without scratching. Different colors prevent cross-contamination between tasks.',
-    howToUse: 'Use designated colors: Blue for drying, gray for buffing/wax removal, black for interior. Fold into quarters for multiple clean sides. Machine wash without fabric softener.',
-    whoIsItFor: 'both',
-    isBestSeller: true,
-    relatedProducts: ['premium-shampoo', 'interior-detailer', 'ceramic-wax']
-  },
-
-  // PROTECTION
-  {
-    id: 'ceramic-wax',
-    name: 'Ceramic Spray Wax',
-    slug: 'ceramic-spray-wax',
-    category: 'protection',
-    price: 39.99,
-    image: 'https://images.unsplash.com/photo-1678383407784-41d006e088c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjB3YXglMjBwb2xpc2glMjBib3R0bGV8ZW58MXx8fHwxNzc2NDQxNDA1fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Easy spray-on protection with 3-month durability',
-    description: 'Hybrid ceramic SiO2 formula provides instant shine and water beading. UV protection and hydrophobic properties. 16 oz bottle covers 15+ cars.',
-    whatIsItFor: 'Adding a protective layer that repels water, makes future washing easier, and enhances gloss. Perfect as a drying aid or standalone sealant.',
-    howToUse: '1. Apply to clean, wet or dry paint. 2. Spray on panel by panel. 3. Spread with microfiber towel. 4. Buff to high gloss. Can be used as drying aid.',
-    whoIsItFor: 'both',
-    isBestSeller: true,
-    relatedProducts: ['premium-shampoo', 'microfiber-set', 'paint-polish']
-  },
-
-  // INTERIOR
-  {
-    id: 'leather-cleaner',
-    name: 'Leather Cleaner & Conditioner',
-    slug: 'leather-cleaner-conditioner',
-    category: 'interior',
-    price: 29.99,
-    image: 'https://images.unsplash.com/photo-1590456744036-1467d08b88a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjBpbnRlcmlvciUyMGNsZWFuJTIwbGVhdGhlcnxlbnwxfHx8fDE3NzY0NDE0MDV8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Gentle cleaner + conditioner for leather seats',
-    description: 'pH balanced formula safely cleans and conditions in one step. Removes dirt and body oils while preventing cracking and fading. Fresh leather scent.',
-    whatIsItFor: 'Maintaining leather seats, steering wheels, and door panels. Prevents premature aging and keeps leather soft and supple.',
-    howToUse: '1. Vacuum seats first. 2. Spray onto applicator or directly on leather. 3. Gently agitate with soft brush. 4. Wipe clean with microfiber. 5. Buff dry.',
-    whoIsItFor: 'both',
-    relatedProducts: ['interior-detailer', 'microfiber-set', 'interior-kit']
+    id: 'juego-sabanas-bruma',
+    name: 'Juego de sabanas Bruma',
+    slug: 'juego-sabanas-bruma',
+    category: 'sabanas',
+    price: 38900,
+    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Juego completo con bajera, sabana superior y fundas.',
+    description: 'Un juego completo para que la cama se vea prolija y se sienta suave desde el primer uso.',
+    material: 'Algodon mixto peinado.',
+    care: 'Lavar en agua fria y doblar apenas seco para evitar marcas profundas.',
+    benefits: ['Juego completo', 'Colores neutros', 'Tacto suave', 'Facil de lavar'],
+    badges: ['Juego completo', 'Cama lista'],
+    variants: [
+      { id: '2-plazas', label: '2 plazas', price: 38900, stock: 9, isDefault: true },
+      { id: 'queen', label: 'Queen', price: 44900, stock: 7 },
+      { id: 'king', label: 'King', price: 49900, stock: 5 },
+    ],
+    relatedProducts: ['almohada-hotel-soft', 'frazada-sherpa-nube'],
   },
   {
-    id: 'interior-detailer',
-    name: 'Interior Quick Detailer',
-    slug: 'interior-quick-detailer',
-    category: 'interior',
-    price: 19.99,
-    image: 'https://images.unsplash.com/photo-1590456744036-1467d08b88a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjBpbnRlcmlvciUyMGNsZWFuJTIwbGVhdGhlcnxlbnwxfHx8fDE3NzY0NDE0MDV8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Fast cleaner for dashboard, console, and plastics',
-    description: 'Non-greasy spray for all interior plastics and vinyl. Anti-static formula repels dust. Leaves natural matte or satin finish, no shine.',
-    whatIsItFor: 'Quick cleaning and protecting dashboard, door panels, center console, and other plastic surfaces between deep cleans.',
-    howToUse: '1. Spray onto microfiber cloth (not directly on surface). 2. Wipe all plastic surfaces. 3. Buff with clean side of towel. Safe for screens when used on cloth.',
-    whoIsItFor: 'beginner',
-    relatedProducts: ['leather-cleaner', 'microfiber-set', 'interior-kit']
+    id: 'manta-liviana-sofa-cama',
+    name: 'Manta liviana sofa/cama',
+    slug: 'manta-liviana-sofa-cama',
+    category: 'frazadas',
+    price: 19900,
+    image: 'https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=1200&q=82',
+    shortDescription: 'Manta de apoyo para siesta, sillon o pie de cama.',
+    description: 'Una capa extra para tener a mano. Decora, abriga y no ocupa lugar.',
+    material: 'Tejido soft touch.',
+    care: 'Lavar en ciclo suave y no usar blanqueadores.',
+    benefits: ['Liviana', 'Decorativa', 'Multiuso', 'Ideal regalo'],
+    badges: ['Soft touch', 'Regalo util'],
+    variants: [
+      { id: 'beige', label: 'Beige', price: 19900, stock: 14, isDefault: true },
+      { id: 'gris', label: 'Gris', price: 19900, stock: 12 },
+      { id: 'verde-salvia', label: 'Verde salvia', price: 20900, stock: 8 },
+    ],
+    relatedProducts: ['combo-sueno-calido', 'almohada-hotel-soft'],
   },
-
-  // ACCESSORIES
-  {
-    id: 'tire-cleaner',
-    name: 'Tire & Wheel Cleaner',
-    slug: 'tire-wheel-cleaner',
-    category: 'accessories',
-    price: 22.99,
-    image: 'https://images.unsplash.com/photo-1697273245326-1a3736f6f428?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXIlMjBzaGFtcG9vJTIwYm90dGxlJTIwcHJvZHVjdHxlbnwxfHx8fDE3NzY0NDE0MDR8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Iron-removing formula for wheels and tires',
-    description: 'Color-changing formula turns purple when dissolving brake dust. Safe for all wheel finishes. Acid-free, pH balanced.',
-    whatIsItFor: 'Deep cleaning brake dust, road grime, and tar from wheels and tires. Restores like-new appearance.',
-    howToUse: '1. Spray generously on cool, dry wheels. 2. Let dwell 3-5 minutes (watch it turn purple). 3. Agitate with brush. 4. Rinse thoroughly. Do not let dry.',
-    whoIsItFor: 'both',
-    relatedProducts: ['premium-shampoo', 'wheel-brush', 'tire-dressing']
-  },
-  {
-    id: 'clay-bar',
-    name: 'Clay Bar Kit',
-    slug: 'clay-bar-kit',
-    category: 'accessories',
-    price: 27.99,
-    image: 'https://images.unsplash.com/photo-1620584898989-d39f7f9ed1b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZXRhaWxpbmclMjBraXQlMjBwcm9kdWN0cyUyMHRvb2xzfGVufDF8fHx8MTc3NjQ0MTQwNnww&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Remove embedded contaminants for glass-smooth paint',
-    description: 'Medium-grade clay bar with lubricant spray. Safely removes overspray, tree sap, rail dust, and industrial fallout. Two 100g bars included.',
-    whatIsItFor: 'Decontaminating paint before polishing or wax application. Removes bonded contaminants that washing can\'t remove.',
-    howToUse: '1. Wash and dry car first. 2. Spray lubricant on small section. 3. Glide clay bar with light pressure. 4. Wipe clean. 5. Re-knead clay when dirty.',
-    whoIsItFor: 'advanced',
-    relatedProducts: ['paint-polish', 'ceramic-wax', 'shine-kit']
-  },
-  {
-    id: 'paint-polish',
-    name: 'One-Step Paint Polish',
-    slug: 'one-step-paint-polish',
-    category: 'protection',
-    price: 32.99,
-    image: 'https://images.unsplash.com/photo-1723659081228-94b14d1e61d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjYXIlMjBkZXRhaWwlMjBzaGluZXxlbnwxfHx8fDE3NzYzODI1NTZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    shortDescription: 'Remove light swirls and restore deep gloss',
-    description: 'All-in-one polish removes light scratches, swirls, and oxidation while leaving a protective layer. Hand or machine application.',
-    whatIsItFor: 'Correcting minor paint imperfections and restoring clarity and depth to faded or swirled paint.',
-    howToUse: '1. Work on cool paint in shade. 2. Apply small amount to applicator. 3. Work in 2x2 sections with circular motions. 4. Buff off haze with microfiber.',
-    whoIsItFor: 'advanced',
-    relatedProducts: ['clay-bar', 'ceramic-wax', 'microfiber-set']
-  }
 ];
 
 export const getProductBySlug = (slug: string): Product | undefined => {
-  return products.find(p => p.slug === slug);
+  return products.find((p) => p.slug === slug);
+};
+
+export const getProductById = (id: string): Product | undefined => {
+  return products.find((p) => p.id === id);
 };
 
 export const getProductsByCategory = (category: string): Product[] => {
-  return products.filter(p => p.category === category);
+  if (category === 'blanqueria') {
+    return products.filter((p) => ['sabanas', 'almohadas', 'frazadas'].includes(p.category));
+  }
+
+  return products.filter((p) => p.category === category);
 };
 
 export const getBestSellers = (): Product[] => {
-  return products.filter(p => p.isBestSeller);
+  return products.filter((p) => p.isBestSeller);
 };
 
 export const getKits = (): Product[] => {
-  return products.filter(p => p.isKit);
+  return products.filter((p) => p.isKit);
+};
+
+export const getFeaturedProducts = (): Product[] => {
+  return products.filter((p) => p.featured || p.isBestSeller).slice(0, 6);
 };
 
 export const getRelatedProducts = (productId: string): Product[] => {
-  const product = products.find(p => p.id === productId);
+  const product = products.find((p) => p.id === productId);
   if (!product || !product.relatedProducts) return [];
-  
+
   return product.relatedProducts
-    .map(id => products.find(p => p.id === id))
+    .map((id) => products.find((p) => p.id === id))
     .filter((p): p is Product => p !== undefined);
 };

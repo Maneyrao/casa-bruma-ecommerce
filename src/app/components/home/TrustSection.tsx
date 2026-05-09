@@ -1,115 +1,88 @@
 import { motion } from 'motion/react';
-import { Truck, CreditCard, MessageCircle, RotateCcw, Star } from 'lucide-react';
+import { HeartHandshake, MessageCircle, RotateCcw, Star, Truck } from 'lucide-react';
 
 const trustItems = [
   {
     icon: Truck,
-    title: 'Free Shipping',
-    description: 'On orders over $75'
+    title: 'Envios y retiro',
+    description: 'Coordinamos la mejor opcion segun tu zona.',
   },
   {
     icon: RotateCcw,
-    title: '30-Day Returns',
-    description: 'Money-back guarantee'
-  },
-  {
-    icon: CreditCard,
-    title: 'Secure Payment',
-    description: 'SSL encrypted checkout'
+    title: 'Cambios simples',
+    description: 'Te ayudamos con talles, medidas y alternativas.',
   },
   {
     icon: MessageCircle,
-    title: 'WhatsApp Support',
-    description: 'Expert help anytime'
-  }
+    title: 'Atencion por WhatsApp',
+    description: 'El pedido llega con productos, variantes y total.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Compra acompanada',
+    description: 'Recomendamos combos sin empujar productos de mas.',
+  },
 ];
 
 const reviews = [
   {
-    name: 'Mike Johnson',
-    rating: 5,
-    text: 'The Beginner Kit is perfect! Everything I needed to start detailing. My car looks amazing.',
-    product: 'Beginner Detail Kit'
+    name: 'Cliente de invierno',
+    text: 'Me resolvieron la cama completa en un mensaje. El combo llego listo para usar.',
   },
   {
-    name: 'Sarah Chen',
-    rating: 5,
-    text: 'Best microfiber towels I\'ve used. No scratches, super absorbent. Worth every penny.',
-    product: 'Premium Microfiber Set'
+    name: 'Compra de termicas',
+    text: 'Pude elegir talle y sumar pack x2 sin perderme. Super directo.',
   },
   {
-    name: 'David Martinez',
-    rating: 5,
-    text: 'The ceramic spray wax is incredible. Water just beads off. Easy application too.',
-    product: 'Ceramic Spray Wax'
-  }
+    name: 'Regalo util',
+    text: 'La manta y la almohada fueron un regalo perfecto. Buen asesoramiento.',
+  },
 ];
 
 export const TrustSection = () => {
   return (
-    <section className="py-16 bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Trust Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+    <section className="bg-[#fbf6ee] py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {trustItems.map((item, index) => (
             <motion.div
-              key={index}
+              key={item.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="text-center"
+              transition={{ delay: index * 0.05 }}
+              className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-5"
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-800 rounded-full mb-4">
-                <item.icon className="w-8 h-8 text-[#0EA5E9]" />
-              </div>
-              <h3 className="text-white font-semibold mb-1">{item.title}</h3>
-              <p className="text-gray-400 text-sm">{item.description}</p>
+              <item.icon className="mb-4 h-8 w-8 text-[#9d6b54]" />
+              <h3 className="mb-2 font-black text-[#211b17]">{item.title}</h3>
+              <p className="text-sm leading-6 text-[#665b52]">{item.description}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Customer Reviews */}
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Trusted by Detailers
-            </h2>
-            <div className="flex items-center justify-center gap-1 mb-2">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-6 h-6 text-yellow-400 fill-current" />
-              ))}
-            </div>
-            <p className="text-gray-400 text-lg">
-              4.9/5 rating from over 2,500 customers
-            </p>
-          </motion.div>
+        <div className="mb-8 text-center">
+          <h2 className="font-serif text-4xl font-black tracking-normal text-[#211b17] md:text-5xl">
+            La tienda tiene que sentirse como la cama: facil.
+          </h2>
+          <div className="mt-4 flex items-center justify-center gap-1">
+            {[...Array(5)].map((_, index) => (
+              <Star key={index} className="h-5 w-5 fill-current text-[#d7a85f]" />
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {reviews.map((review, index) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
+              key={review.name}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.15 }}
-              className="bg-gray-800 rounded-xl p-6 border border-gray-700"
+              transition={{ delay: index * 0.08 }}
+              className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fff8ed] p-6"
             >
-              <div className="flex items-center gap-1 mb-3">
-                {[...Array(review.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                ))}
-              </div>
-              <p className="text-gray-300 mb-4 italic">"{review.text}"</p>
-              <div className="border-t border-gray-700 pt-4">
-                <p className="text-white font-semibold">{review.name}</p>
-                <p className="text-gray-400 text-sm">{review.product}</p>
-              </div>
+              <p className="mb-5 text-[#665b52]">"{review.text}"</p>
+              <p className="font-black text-[#211b17]">{review.name}</p>
             </motion.div>
           ))}
         </div>

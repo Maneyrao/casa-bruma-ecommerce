@@ -7,22 +7,32 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Scrollbar styling for dark theme */
+body {
+  background: #fffaf7;
+}
+
+button,
+a,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #fffaf7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: #d9c8d6;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #b89ab5;
 }
 
 /* Line clamp utilities */

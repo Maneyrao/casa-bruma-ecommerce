@@ -1,77 +1,56 @@
 import { motion } from 'motion/react';
-import { Target, Package, Sparkles } from 'lucide-react';
+import { MessageCircle, Ruler, ShoppingBag } from 'lucide-react';
 
 const steps = [
   {
-    icon: Target,
-    title: 'Choose Your Goal',
-    description: 'Tell us what you want to achieve - clean, shine, protect, or all of the above.'
+    icon: Ruler,
+    title: 'Elegi talle o medida',
+    description: 'Cada producto muestra variantes claras: talle, plaza, color o medida.',
   },
   {
-    icon: Package,
-    title: 'Get the Right Products',
-    description: 'We recommend exactly what you need. No guessing, no wasted money on wrong products.'
+    icon: ShoppingBag,
+    title: 'Arma el carrito',
+    description: 'Sumas productos, packs o combos con total estimado en pesos argentinos.',
   },
   {
-    icon: Sparkles,
-    title: 'Achieve Pro Results',
-    description: 'Follow our simple guides and get professional-quality results, even as a beginner.'
-  }
+    icon: MessageCircle,
+    title: 'Coordinamos por WhatsApp',
+    description: 'Enviamos el pedido completo para confirmar stock, envio y forma de pago.',
+  },
 ];
 
 export const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-16 bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              How It Works
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Detailing made simple. We guide you every step of the way.
-            </p>
-          </motion.div>
+    <section id="how-it-works" className="bg-[#fff8ed] py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center">
+          <span className="text-xs font-black uppercase tracking-[0.18em] text-[#9d6b54]">
+            Compra directa
+          </span>
+          <h2 className="mt-2 font-serif text-4xl font-black tracking-normal text-[#211b17] md:text-5xl">
+            Simple como mandar un mensaje.
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-[#665b52]">
+            Sin pago online visible por ahora: primero buscamos que entren consultas listas para cerrar.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Connection Lines (desktop) */}
-          <div className="hidden md:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#0EA5E9] to-transparent" />
-
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {steps.map((step, index) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
+              key={step.title}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="relative"
+              transition={{ delay: index * 0.08 }}
+              className="rounded-[1.5rem] border border-[#ead9c5] bg-[#fbf6ee] p-6"
             >
-              <div className="text-center">
-                {/* Icon */}
-                <div className="relative inline-flex items-center justify-center mb-6">
-                  <div className="absolute inset-0 bg-[#0EA5E9] blur-xl opacity-30 rounded-full" />
-                  <div className="relative bg-gradient-to-br from-[#0EA5E9] to-[#38BDF8] p-6 rounded-full">
-                    <step.icon className="w-8 h-8 text-white" />
-                  </div>
-                  {/* Step Number */}
-                  <div className="absolute -bottom-2 -right-2 bg-gray-900 border-2 border-[#0EA5E9] rounded-full w-8 h-8 flex items-center justify-center">
-                    <span className="text-[#0EA5E9] font-bold text-sm">{index + 1}</span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <h3 className="text-xl font-bold text-white mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-gray-400">
-                  {step.description}
-                </p>
+              <div className="mb-6 inline-flex rounded-2xl bg-[#211b17] p-4 text-[#fff8ed]">
+                <step.icon className="h-7 w-7" />
               </div>
+              <span className="mb-3 block text-sm font-black text-[#9d6b54]">Paso {index + 1}</span>
+              <h3 className="mb-3 text-xl font-black text-[#211b17]">{step.title}</h3>
+              <p className="leading-7 text-[#665b52]">{step.description}</p>
             </motion.div>
           ))}
         </div>
